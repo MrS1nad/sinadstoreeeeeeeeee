@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ beat.title }} — Sinad!Store{% endblock %}
+
+{% block content %}
+<section class="beat-detail">
+    <div class="beat-detail-cover">
+        <img src="{{ beat.cover.url }}" alt="{{ beat.title }}">
+    </div>
+
+    <div class="beat-detail-info">
+        <h1>{{ beat.title }}</h1>
+        <p class="beat-meta">
+            {% if beat.genre %}{{ beat.genre }}{% endif %}
+            {% if beat.bpm %} · {{ beat.bpm }} BPM{% endif %}
+        </p>
+
+        {% if beat.description %}
+            <p class="beat-description">{{ beat.description }}</p>
+        {% endif %}
+
+        <div class="player-block">
+            <p class="player-label">Превью</p>
+            <audio controls src="{{ beat.preview_audio.url }}"></audio>
+        </div>
+
+        <div class="purchase-block">
+            <span class="beat-price-big">{{ beat.price }} $</span>
+
+            {% if already_purchased %}
+                <a href="{% url 'download_beat' beat.slug %}" class="btn btn-primary">Скачать полный трек</a>
+            {% else %}
+                {% if user.is_authenticated %}
+                    <form action="{% url 'start_purchase' beat.slug %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Купить за {{ beat.price }} $</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">
+                        Войти, чтобы купить
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

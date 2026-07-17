@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Все биты — Sinad!Store{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Биты, которые звучат</h1>
+    <p>Слушай превью бесплатно. Покупай — и получай полный трек без тегов.</p>
+</section>
+
+<section class="beat-grid">
+    {% for beat in beats %}
+        <a href="{% url 'beat_detail' beat.slug %}" class="beat-card">
+            <div class="beat-cover">
+                <img src="{{ beat.cover.url }}" alt="{{ beat.title }}">
+                <div class="beat-cover-overlay">
+                    <span class="play-icon">&#9658;</span>
+                </div>
+            </div>
+            <div class="beat-info">
+                <h3>{{ beat.title }}</h3>
+                <p class="beat-meta">
+                    {% if beat.genre %}{{ beat.genre }}{% endif %}
+                    {% if beat.bpm %} · {{ beat.bpm }} BPM{% endif %}
+                </p>
+                <p class="beat-price">{{ beat.price }} $</p>
+            </div>
+        </a>
+    {% empty %}
+        <p>Пока нет опубликованных битов.</p>
+    {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Вход — Sinad!Store{% endblock %}
+
+{% block content %}
+<section class="auth-form">
+    <h1>Вход</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Войти</button>
+    </form>
+</section>
+{% endblock %}

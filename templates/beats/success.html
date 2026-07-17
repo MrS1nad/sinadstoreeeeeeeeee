@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Оплата — Sinad!Store{% endblock %}
+
+{% block content %}
+<section class="success-block">
+    {% if purchase.status == 'paid' %}
+        <h1>Оплата прошла успешно</h1>
+        <p>Бит «{{ purchase.beat.title }}» теперь доступен для скачивания.</p>
+        <a href="{% url 'download_beat' purchase.beat.slug %}" class="btn btn-primary">Скачать</a>
+    {% else %}
+        <h1>Платёж обрабатывается</h1>
+        <p>Если оплата прошла, обнови страницу через несколько секунд.</p>
+        <a href="{% url 'beat_detail' purchase.beat.slug %}" class="btn btn-secondary">Вернуться к биту</a>
+    {% endif %}
+</section>
+{% endblock %}

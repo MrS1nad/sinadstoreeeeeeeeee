@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sinad!Store{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="{% url 'beat_list' %}" class="logo">SINAD!<span>STORE</span></a>
+            <nav class="nav">
+                {% if user.is_authenticated %}
+                    <span class="nav-user">{{ user.username }}</span>
+                    <form action="{% url 'logout' %}" method="post" class="inline-form">
+                        {% csrf_token %}
+                        <button type="submit" class="link-button">Выйти</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}">Войти</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; {% now "Y" %} Sinad!Store. Все биты защищены авторским правом.</p>
+        </div>
+    </footer>
+</body>
+</html>
