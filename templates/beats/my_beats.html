@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Мои биты — SinadStore{% endblock %}
+
+{% block content %}
+<section class="my-beats">
+    <div class="my-beats-header">
+        <h1>Мои биты</h1>
+        <a href="{% url 'upload_beat' %}" class="btn btn-primary">+ Загрузить новый</a>
+    </div>
+
+    <table class="beats-table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Цена</th>
+                <th>Продано</th>
+                <th>Статус</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for beat in beats %}
+                <tr>
+                    <td><a href="{% url 'beat_detail' beat.slug %}">{{ beat.title }}</a></td>
+                    <td>{{ beat.price }} $</td>
+                    <td>{{ beat.sales_count }}</td>
+                    <td>{% if beat.is_active %}Опубликован{% else %}Скрыт{% endif %}</td>
+                    <td><a href="{% url 'edit_beat' beat.slug %}">Редактировать</a></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5">Ты пока не загрузил ни одного бита.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

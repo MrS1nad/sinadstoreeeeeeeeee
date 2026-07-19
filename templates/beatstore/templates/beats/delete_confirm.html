@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Удалить бит — BeatStore{% endblock %}
+
+{% block content %}
+<section class="auth-form">
+    <h1>Удалить «{{ beat.title }}»?</h1>
+    <p>Это действие нельзя отменить. Бит и все связанные с ним файлы будут удалены безвозвратно.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Да, удалить</button>
+        <a href="{% url 'edit_beat' beat.slug %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</section>
+{% endblock %}

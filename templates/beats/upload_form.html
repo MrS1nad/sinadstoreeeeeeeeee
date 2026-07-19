@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_edit %}Редактировать бит{% else %}Загрузить бит{% endif %} — SinadStore{% endblock %}
+
+{% block content %}
+<section class="auth-form upload-form">
+    <h1>{% if is_edit %}Редактировать «{{ beat.title }}»{% else %}Загрузить новый бит{% endif %}</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">
+            {% if is_edit %}Сохранить изменения{% else %}Опубликовать{% endif %}
+        </button>
+    </form>
+
+    {% if is_edit %}
+        <p class="auth-switch">
+            <a href="{% url 'delete_beat' beat.slug %}">Удалить этот бит</a>
+        </p>
+    {% endif %}
+</section>
+{% endblock %}

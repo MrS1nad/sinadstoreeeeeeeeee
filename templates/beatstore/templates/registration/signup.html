@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация — BeatStore{% endblock %}
+
+{% block content %}
+<section class="auth-form">
+    <h1>Регистрация</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Создать аккаунт</button>
+    </form>
+    <p class="auth-switch">
+        Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a>
+    </p>
+</section>
+{% endblock %}

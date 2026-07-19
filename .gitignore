@@ -1,0 +1,22 @@
+# Секреты — никогда не заливать в репозиторий
+.env
+
+# База данных с реальными данными
+db.sqlite3
+
+# Загруженные пользователями файлы (обложки, аудио)
+media/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+*.egg-info/
+
+# Django
+staticfiles/
+
+# IDE
+.vscode/
+.idea/

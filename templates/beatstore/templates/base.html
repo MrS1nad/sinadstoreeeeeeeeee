@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SinadStore{% endblock %}</title>
+    <title>{% block title %}BeatStore{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     <header class="site-header">
         <div class="container header-inner">
-            <a href="{% url 'beat_list' %}" class="logo">SINAD<span>STORE</span></a>
+            <a href="{% url 'beat_list' %}" class="logo">BEAT<span>STORE</span></a>
             <nav class="nav">
                 {% if user.is_authenticated %}
                     <a href="{% url 'upload_beat' %}">Загрузить бит</a>
@@ -41,7 +41,7 @@
 
     <footer class="site-footer">
         <div class="container">
-            <p>&copy; {% now "Y" %} SinadStore. Все биты защищены авторским правом.</p>
+            <p>&copy; {% now "Y" %} BeatStore. Все биты защищены авторским правом.</p>
         </div>
     </footer>
 </body>
