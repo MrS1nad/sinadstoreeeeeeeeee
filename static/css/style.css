@@ -256,6 +256,46 @@ audio {
     margin-top: 20px;
 }
 
+.download-block {
+    margin-top: 20px;
+    padding: 24px;
+    background: var(--dark);
+    border: 1px solid var(--gray-800);
+    border-radius: var(--radius);
+}
+
+.download-hint {
+    color: var(--gray-400);
+    font-size: 14px;
+    margin: 0 0 16px;
+}
+
+.download-form p {
+    margin: 0 0 14px;
+}
+
+.download-form label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--gray-400);
+    font-size: 13px;
+}
+
+.download-form input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--black);
+    border: 1px solid var(--gray-600);
+    border-radius: var(--radius);
+    color: var(--white);
+    font-size: 14px;
+}
+
+.download-form input:focus {
+    outline: none;
+    border-color: var(--white);
+}
+
 .beat-price-big {
     color: var(--white);
     font-size: 28px;
@@ -406,6 +446,81 @@ form button.btn {
 
 .beats-table tr:last-child td {
     border-bottom: none;
+}
+
+.beat-author {
+    color: var(--gray-400);
+    font-size: 13px;
+    margin: 0 0 6px;
+}
+
+.beat-author a {
+    color: var(--white);
+    text-decoration: underline;
+}
+
+/* ---------- Producers ---------- */
+.producer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    padding-bottom: 60px;
+}
+
+.producer-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--dark);
+    border: 1px solid var(--gray-800);
+    border-radius: var(--radius);
+    padding: 18px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.producer-card:hover {
+    border-color: var(--gray-400);
+    transform: translateY(-2px);
+}
+
+.producer-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--black);
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.producer-info h3 {
+    margin: 0 0 2px;
+    color: var(--white);
+    font-size: 16px;
+}
+
+.producer-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 48px 0 32px;
+    border-bottom: 1px solid var(--gray-800);
+    margin-bottom: 32px;
+}
+
+.producer-header h1 {
+    color: var(--white);
+    margin: 0 0 4px;
+}
+
+.producer-avatar-big {
+    width: 72px;
+    height: 72px;
+    font-size: 28px;
 }
 
 /* ---------- Footer ---------- */

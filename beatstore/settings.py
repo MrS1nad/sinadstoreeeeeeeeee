@@ -85,6 +85,9 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
@@ -98,14 +101,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-
-# ---------------------------------------------------------------------------
-# Настройки оплаты (Stripe в качестве примера).
-# Если работаешь с российской аудиторией — замени payments.py на интеграцию
-# с ЮKassa / CloudPayments / Robokassa, интерфейс функций оставь тем же.
-# ---------------------------------------------------------------------------
-STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY', default='')
-STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
-STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='')
 
 SITE_DOMAIN = config('SITE_DOMAIN', default='http://127.0.0.1:8000')

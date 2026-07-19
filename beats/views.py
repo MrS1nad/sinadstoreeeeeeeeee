@@ -1,14 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q
-from django.http import FileResponse, Http404
+from django.contrib.auth.models import User
+from django.db.models import Count
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
 
-from .models import Beat, Purchase
-from .forms import BeatForm, SignUpForm
-from . import payments
+from .models import Beat, DownloadRequest
+from .forms import BeatForm, SignUpForm, DownloadRequestForm
 
 
 def signup(request):
@@ -30,61 +29,72 @@ def signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 
+def producer_list(request):
+    """Публичный список всех авторов, у кого есть опубликованные биты."""
+    producers = User.objects.filter(beats__is_active=True).annotate(
+        beat_count=Count('beats')
+    ).distinct().order_by('-beat_count')
+
+    return render(request, 'beats/producer_list.html', {'producers': producers})
+
+
+def producer_detail(request, username):
+    """Публичный профиль автора со списком его битов."""
+    producer = get_object_or_404(User, username=username)
+    beats = Beat.objects.filter(author=producer, is_active=True)
+
+    return render(request, 'beats/producer_detail.html', {
+        'producer': producer,
+        'beats': beats,
+    })
+
+
 def beat_list(request):
     beats = Beat.objects.filter(is_active=True)
     return render(request, 'beats/list.html', {'beats': beats})
 
 
 def beat_detail(request, slug):
+    """
+    Страница бита. Показывает превью и форму — человек вписывает
+    Telegram/телефон/почту и сразу получает файл на скачивание.
+    """
     beat = get_object_or_404(Beat, slug=slug, is_active=True)
+    is_author = request.user.is_authenticated and beat.author_id == request.user.id
 
-    already_purchased = False
-    is_author = False
-    if request.user.is_authenticated:
-        is_author = beat.author_id == request.user.id
-        already_purchased = is_author or Purchase.objects.filter(
-            user=request.user, beat=beat, status=Purchase.STATUS_PAID
-        ).exists()
+    if request.method == 'POST':
+        form = DownloadRequestForm(request.POST)
+        if form.is_valid():
+            download_request = form.save(commit=False)
+            download_request.beat = beat
+            if request.user.is_authenticated:
+                download_request.user = request.user
+            download_request.save()
+
+            return FileResponse(
+                beat.full_audio.open('rb'),
+                as_attachment=True,
+                filename=f'{beat.slug}.mp3',
+            )
+    else:
+        form = DownloadRequestForm()
 
     return render(request, 'beats/detail.html', {
         'beat': beat,
-        'already_purchased': already_purchased,
+        'form': form,
         'is_author': is_author,
     })
 
 
 @login_required
-def start_purchase(request, slug):
-    """Создаёт заявку на покупку и уводит пользователя на оплату."""
-    beat = get_object_or_404(Beat, slug=slug, is_active=True)
-
-    if Purchase.objects.filter(user=request.user, beat=beat, status=Purchase.STATUS_PAID).exists():
-        messages.info(request, 'Ты уже купил этот бит.')
-        return redirect('beat_detail', slug=beat.slug)
-
-    purchase = Purchase.objects.create(
-        user=request.user,
-        beat=beat,
-        amount=beat.price,
-        status=Purchase.STATUS_PENDING,
+def download_own_beat(request, slug):
+    """Автор скачивает свой собственный бит без заполнения формы."""
+    beat = get_object_or_404(Beat, slug=slug, author=request.user)
+    return FileResponse(
+        beat.full_audio.open('rb'),
+        as_attachment=True,
+        filename=f'{beat.slug}.mp3',
     )
-
-    checkout_url = payments.create_checkout_session(purchase, request)
-    return redirect(checkout_url)
-
-
-@login_required
-def purchase_success(request, purchase_id):
-    purchase = get_object_or_404(Purchase, id=purchase_id, user=request.user)
-    session_id = request.GET.get('session_id')
-
-    if purchase.status != Purchase.STATUS_PAID and session_id:
-        if payments.verify_session_paid(session_id):
-            purchase.status = Purchase.STATUS_PAID
-            purchase.paid_at = timezone.now()
-            purchase.save(update_fields=['status', 'paid_at'])
-
-    return render(request, 'beats/success.html', {'purchase': purchase})
 
 
 @login_required
@@ -137,28 +147,16 @@ def delete_beat(request, slug):
 
 @login_required
 def my_beats(request):
-    """Личный кабинет автора со списком его битов и статистикой продаж."""
+    """Личный кабинет автора: список его битов и сколько раз каждый скачали."""
     beats = Beat.objects.filter(author=request.user).annotate(
-        sales_count=Count('purchases', filter=Q(purchases__status=Purchase.STATUS_PAID))
+        download_count=Count('download_requests')
     )
     return render(request, 'beats/my_beats.html', {'beats': beats})
 
 
 @login_required
-def download_beat(request, slug):
-    """Отдаёт полный файл только тем, кто реально оплатил."""
-    beat = get_object_or_404(Beat, slug=slug)
-
-    is_author = beat.author_id == request.user.id
-    purchased = is_author or Purchase.objects.filter(
-        user=request.user, beat=beat, status=Purchase.STATUS_PAID
-    ).exists()
-
-    if not purchased:
-        raise Http404('Покупка не найдена')
-
-    return FileResponse(
-        beat.full_audio.open('rb'),
-        as_attachment=True,
-        filename=f'{beat.slug}.mp3',
-    )
+def beat_leads(request, slug):
+    """Список контактов тех, кто скачал конкретный бит — видит только автор."""
+    beat = get_object_or_404(Beat, slug=slug, author=request.user)
+    leads = DownloadRequest.objects.filter(beat=beat)
+    return render(request, 'beats/leads.html', {'beat': beat, 'leads': leads})

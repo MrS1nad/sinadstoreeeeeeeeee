@@ -13,9 +13,9 @@
         <thead>
             <tr>
                 <th>Название</th>
-                <th>Цена</th>
-                <th>Продано</th>
+                <th>Скачиваний</th>
                 <th>Статус</th>
+                <th></th>
                 <th></th>
             </tr>
         </thead>
@@ -23,9 +23,9 @@
             {% for beat in beats %}
                 <tr>
                     <td><a href="{% url 'beat_detail' beat.slug %}">{{ beat.title }}</a></td>
-                    <td>{{ beat.price }} $</td>
-                    <td>{{ beat.sales_count }}</td>
+                    <td>{{ beat.download_count }}</td>
                     <td>{% if beat.is_active %}Опубликован{% else %}Скрыт{% endif %}</td>
+                    <td><a href="{% url 'beat_leads' beat.slug %}">Контакты скачавших</a></td>
                     <td><a href="{% url 'edit_beat' beat.slug %}">Редактировать</a></td>
                 </tr>
             {% empty %}

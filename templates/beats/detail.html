@@ -14,6 +14,9 @@
             {% if beat.genre %}{{ beat.genre }}{% endif %}
             {% if beat.bpm %} · {{ beat.bpm }} BPM{% endif %}
         </p>
+        <p class="beat-author">
+            Автор: <a href="{% url 'producer_detail' beat.author.username %}">{{ beat.author.username }}</a>
+        </p>
 
         {% if beat.description %}
             <p class="beat-description">{{ beat.description }}</p>
@@ -24,22 +27,17 @@
             <audio controls src="{{ beat.preview_audio.url }}"></audio>
         </div>
 
-        <div class="purchase-block">
-            <span class="beat-price-big">{{ beat.price }} $</span>
-
-            {% if already_purchased %}
-                <a href="{% url 'download_beat' beat.slug %}" class="btn btn-primary">Скачать полный трек</a>
+        <div class="download-block">
+            {% if is_author %}
+                <p class="download-hint">Это твой бит — можешь скачать без формы.</p>
+                <a href="{% url 'download_own_beat' beat.slug %}" class="btn btn-primary">Скачать полный трек</a>
             {% else %}
-                {% if user.is_authenticated %}
-                    <form action="{% url 'start_purchase' beat.slug %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-primary">Купить за {{ beat.price }} $</button>
-                    </form>
-                {% else %}
-                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">
-                        Войти, чтобы купить
-                    </a>
-                {% endif %}
+                <p class="download-hint">Оставь контакты — и полный трек сразу скачается.</p>
+                <form method="post" class="download-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Скачать</button>
+                </form>
             {% endif %}
         </div>
     </div>

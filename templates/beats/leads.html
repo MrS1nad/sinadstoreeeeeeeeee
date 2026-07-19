@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Контакты — {{ beat.title }} — SinadStore{% endblock %}
+
+{% block content %}
+<section class="my-beats">
+    <div class="my-beats-header">
+        <h1>Скачавшие «{{ beat.title }}»</h1>
+        <a href="{% url 'my_beats' %}" class="btn btn-secondary">Назад к моим битам</a>
+    </div>
+
+    <table class="beats-table">
+        <thead>
+            <tr>
+                <th>Имя</th>
+                <th>Telegram</th>
+                <th>Телефон</th>
+                <th>Email</th>
+                <th>Когда</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lead in leads %}
+                <tr>
+                    <td>{{ lead.name|default:"—" }}</td>
+                    <td>{{ lead.telegram }}</td>
+                    <td>{{ lead.phone }}</td>
+                    <td>{{ lead.email }}</td>
+                    <td>{{ lead.created_at|date:"d.m.Y H:i" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5">Пока никто не скачивал этот бит.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Авторы — SinadStore{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Авторы</h1>
+    <p>Найди своего продюсера и слушай всё, что он выложил.</p>
+</section>
+
+<section class="producer-grid">
+    {% for producer in producers %}
+        <a href="{% url 'producer_detail' producer.username %}" class="producer-card">
+            <div class="producer-avatar">{{ producer.username|slice:":1"|upper }}</div>
+            <div class="producer-info">
+                <h3>{{ producer.username }}</h3>
+                <p class="beat-meta">Битов: {{ producer.beat_count }}</p>
+            </div>
+        </a>
+    {% empty %}
+        <p>Пока никто не выложил ни одного бита.</p>
+    {% endfor %}
+</section>
+{% endblock %}

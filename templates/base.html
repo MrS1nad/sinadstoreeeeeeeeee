@@ -12,6 +12,7 @@
         <div class="container header-inner">
             <a href="{% url 'beat_list' %}" class="logo">SINAD<span>STORE</span></a>
             <nav class="nav">
+                <a href="{% url 'producer_list' %}">Авторы</a>
                 {% if user.is_authenticated %}
                     <a href="{% url 'upload_beat' %}">Загрузить бит</a>
                     <a href="{% url 'my_beats' %}">Мои биты</a>

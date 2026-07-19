@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Beat
+from .models import Beat, DownloadRequest
 
 
 class SignUpForm(UserCreationForm):
@@ -18,14 +18,22 @@ class BeatForm(forms.ModelForm):
         model = Beat
         fields = [
             'title', 'description', 'genre', 'bpm',
-            'cover', 'preview_audio', 'full_audio', 'price',
+            'cover', 'preview_audio', 'full_audio',
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }
 
-    def clean_price(self):
-        price = self.cleaned_data['price']
-        if price <= 0:
-            raise forms.ValidationError('Цена должна быть больше нуля.')
-        return price
+
+class DownloadRequestForm(forms.ModelForm):
+    """Форма, которую человек заполняет перед скачиванием полного трека."""
+
+    class Meta:
+        model = DownloadRequest
+        fields = ['name', 'telegram', 'phone', 'email']
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'Как к тебе обращаться'}),
+            'telegram': forms.TextInput(attrs={'placeholder': '@username'}),
+            'phone': forms.TextInput(attrs={'placeholder': '+7 900 000-00-00'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'you@example.com'}),
+        }

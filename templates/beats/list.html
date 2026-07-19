@@ -24,7 +24,7 @@
                     {% if beat.genre %}{{ beat.genre }}{% endif %}
                     {% if beat.bpm %} · {{ beat.bpm }} BPM{% endif %}
                 </p>
-                <p class="beat-price">{{ beat.price }} $</p>
+                <p class="beat-author">by {{ beat.author.username }}</p>
             </div>
         </a>
     {% empty %}

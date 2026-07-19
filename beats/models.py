@@ -26,10 +26,9 @@ class Beat(models.Model):
     # Короткое превью, которое можно слушать бесплатно (например, 30-60 сек, с тегом)
     preview_audio = models.FileField('Превью (для прослушивания)', upload_to='audio_previews/')
 
-    # Полный трек без тегов — открывается только после оплаты
-    full_audio = models.FileField('Полный файл (после покупки)', upload_to='audio_full/')
+    # Полный трек без тегов — открывается после того, как человек оставит контакты
+    full_audio = models.FileField('Полный файл (для скачивания)', upload_to='audio_full/')
 
-    price = models.DecimalField('Цена', max_digits=8, decimal_places=2)
     is_active = models.BooleanField('Опубликован', default=True)
     created_at = models.DateTimeField('Создан', auto_now_add=True)
 
@@ -56,42 +55,34 @@ class Beat(models.Model):
         return reverse('beat_detail', args=[self.slug])
 
 
-class Purchase(models.Model):
-    """Покупка бита конкретным пользователем."""
-
-    STATUS_PENDING = 'pending'
-    STATUS_PAID = 'paid'
-    STATUS_FAILED = 'failed'
-    STATUS_CHOICES = [
-        (STATUS_PENDING, 'Ожидает оплаты'),
-        (STATUS_PAID, 'Оплачено'),
-        (STATUS_FAILED, 'Ошибка оплаты'),
-    ]
+class DownloadRequest(models.Model):
+    """
+    Заявка на скачивание бита. Вместо оплаты человек оставляет контакты —
+    так автор бита может сам связаться с покупателем и договориться об условиях.
+    """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='purchases')
-    beat = models.ForeignKey(Beat, on_delete=models.CASCADE, related_name='purchases')
+    beat = models.ForeignKey(Beat, on_delete=models.CASCADE, related_name='download_requests')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name='download_requests',
+        blank=True,
+        null=True,
+        help_text='Если человек был залогинен в момент скачивания',
+    )
 
-    status = models.CharField('Статус', max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
-    amount = models.DecimalField('Сумма', max_digits=8, decimal_places=2)
-
-    # Идентификатор сессии/платежа во внешней платёжной системе
-    payment_session_id = models.CharField(max_length=255, blank=True)
+    name = models.CharField('Имя', max_length=150, blank=True)
+    telegram = models.CharField('Telegram', max_length=150)
+    phone = models.CharField('Телефон', max_length=50)
+    email = models.EmailField('Email')
 
     created_at = models.DateTimeField('Создана', auto_now_add=True)
-    paid_at = models.DateTimeField('Оплачена', blank=True, null=True)
 
     class Meta:
-        verbose_name = 'Покупка'
-        verbose_name_plural = 'Покупки'
+        verbose_name = 'Заявка на скачивание'
+        verbose_name_plural = 'Заявки на скачивание'
         ordering = ['-created_at']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'beat'],
-                condition=models.Q(status='paid'),
-                name='unique_paid_purchase_per_user_beat',
-            )
-        ]
 
     def __str__(self):
-        return f'{self.user} -> {self.beat} ({self.status})'
+        return f'{self.telegram or self.email} -> {self.beat}'
